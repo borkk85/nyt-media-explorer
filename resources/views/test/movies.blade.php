@@ -11,6 +11,7 @@
         <h1 class="text-3xl font-bold mb-6">NYT Movie Reviews</h1>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
             @foreach($movies as $movie)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="p-4">

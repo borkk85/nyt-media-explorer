@@ -52,18 +52,22 @@ class FetchBestsellerLists extends Command
                 $this->info("Found " . count($lists) . " bestseller lists");
                 
                 // Get the first 5 lists to avoid rate limiting
-                $lists = array_slice($lists, 0, 5);
+                $chunks = array_chunk($lists, 10);
                 
-                foreach ($lists as $list) {
-                    $encodedListName = $list['list_name_encoded'] ?? '';
-                    if (!$encodedListName) continue;
+                foreach ($chunks as $chunk) {
+                    foreach ($chunk as $list) {
+                        $encodedListName = $list['list_name_encoded'] ?? '';
+                        if (!$encodedListName) continue;
+                        
+                        $this->info("Fetching bestsellers for list: {$encodedListName}");
+                        $books = $this->bookRepository->getBestsellers($encodedListName);
+                        $this->info("Fetched " . count($books) . " books");
+                    }
                     
-                    $this->info("Fetching bestsellers for list: {$encodedListName}");
-                    $books = $this->bookRepository->getBestsellers($encodedListName);
-                    $this->info("Fetched " . count($books) . " books");
-                    
-                    // Sleep to avoid hitting the rate limit
-                    sleep(1);
+                    if (next($chunks) !== false) {  
+                        $this->info("Sleeping to avoid rate limits...");
+                        sleep(10);  
+                    }
                 }
             }
             

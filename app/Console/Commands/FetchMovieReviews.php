@@ -13,7 +13,7 @@ class FetchMovieReviews extends Command
      *
      * @var string
      */
-    protected $signature = 'app:fetch-movie-reviews {pages=3 : Number of pages to fetch}';
+    protected $signature = 'app:fetch-movie-reviews {--pages=0 : Number of pages to fetch (0 for all)}';
 
     /**
      * The console command description.
@@ -38,17 +38,25 @@ class FetchMovieReviews extends Command
         $this->info('Starting to fetch NYT movie reviews...');
         
         try {
-            $pages = (int) $this->argument('pages');
+            $pages = $this->option('pages') ? (int)$this->option('pages') : 5; 
             $totalMovies = 0;
             
             for ($page = 0; $page < $pages; $page++) {
                 $this->info("Fetching movie reviews page {$page}...");
+                
+                $apiResponse = $this->movieRepository->getMoviesService()->getMovieReviews($page);
+                $this->info("API Response hits: " . ($apiResponse['response']['meta']['hits'] ?? 'unknown'));
+                $this->info("API Response docs count: " . count($apiResponse['response']['docs'] ?? []));
+                
+                if (!empty($apiResponse['response']['docs'])) {
+                    $this->info("First doc structure: " . json_encode(array_keys($apiResponse['response']['docs'][0])));
+                }
+                
                 $movies = $this->movieRepository->getRecentReviews($page);
                 $totalMovies += count($movies);
-                $this->info("Fetched " . count($movies) . " movie reviews");
+                $this->info("Processed and saved: " . count($movies) . " movie reviews");
                 
-                // Sleep to avoid hitting the rate limit
-                sleep(1);
+                sleep(1); 
             }
             
             $this->info("Finished fetching NYT movie reviews. Total: {$totalMovies}");
