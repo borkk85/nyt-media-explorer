@@ -45,8 +45,8 @@
             @forelse($books as $book)
                 <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
                     <a href="{{ route('books.show', $book) }}" class="block h-full">
-                        <div class="aspect-w-2 aspect-h-3 w-full">
-                            <img class="object-cover w-full h-full" src="{{ $book->image_url ?: 'https://placehold.co/600x900/e2e8f0/1e293b?text=No+Cover' }}" alt="{{ $book->title }}">
+                        <div class="relative aspect-w-2 aspect-h-3 w-full">
+                            <img class="absolute inset-0 object-cover w-full h-full" src="{{ $book->image_url ?: 'https://placehold.co/600x900/e2e8f0/1e293b?text=No+Cover' }}" alt="{{ $book->title }}">
                         </div>
                         <div class="p-4">
                             <h3 class="font-medium text-gray-900 line-clamp-2">{{ $book->title }}</h3>
@@ -134,3 +134,4 @@
     });
 </script>
 @endpush
+@endsection

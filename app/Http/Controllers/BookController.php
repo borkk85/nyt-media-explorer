@@ -55,32 +55,15 @@ class BookController extends Controller
                 break;
             case 'weeks':
             default:
-                $query->orderByRaw('weeks_on_list DESC NULLS LAST');
+                // Fix for MySQL which doesn't support NULLS LAST syntax
+                $query->orderByRaw('IFNULL(weeks_on_list, 0) DESC');
+                $query->orderBy('id', 'DESC'); // Secondary sort for consistent pagination
                 break;
         }
         
         // Add favorited status for authenticated user
         if (Auth::check()) {
             $userId = Auth::id();
-            $book->is_favorited = $book->userFavorites()
-                ->where('user_id', $userId)
-                ->exists();
-        }
-        
-        // Load reviews with their users
-        $book->load(['reviews' => function ($query) {
-            $query->with('user')->latest();
-        }]);
-        
-        // Get related books by the same author
-        $relatedBooks = Book::where('author', $book->author)
-            ->where('id', '!=', $book->id)
-            ->take(6)
-            ->get();
-        
-        return view('books.show', compact('book', 'relatedBooks'));
-    }
-}userId = Auth::id();
             $query->addSelect(['is_favorited' => function ($query) use ($userId) {
                 $query->selectRaw('COUNT(*)')
                     ->from('user_favorites')
@@ -103,4 +86,23 @@ class BookController extends Controller
     {
         // Add favorited status for authenticated user
         if (Auth::check()) {
-            $
+            $userId = Auth::id();
+            $book->is_favorited = $book->userFavorites()
+                ->where('user_id', $userId)
+                ->exists();
+        }
+        
+        // Load reviews with their users
+        $book->load(['reviews' => function ($query) {
+            $query->with('user')->latest();
+        }]);
+        
+        // Get related books by the same author
+        $relatedBooks = Book::where('author', $book->author)
+            ->where('id', '!=', $book->id)
+            ->take(6)
+            ->get();
+        
+        return view('books.show', compact('book', 'relatedBooks'));
+    }
+}

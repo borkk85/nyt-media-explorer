@@ -55,8 +55,8 @@
             @forelse($movies as $movie)
                 <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
                     <a href="{{ route('movies.show', $movie) }}" class="block">
-                        <div class="aspect-w-16 aspect-h-9 w-full">
-                            <img class="object-cover w-full h-full" src="{{ $movie->image_url ?: 'https://placehold.co/800x450/e2e8f0/1e293b?text=No+Image' }}" alt="{{ $movie->display_title }}">
+                        <div class="relative aspect-w-16 aspect-h-9 w-full">
+                            <img class="absolute inset-0 object-cover w-full h-full" src="{{ $movie->image_url ?: 'https://placehold.co/800x450/e2e8f0/1e293b?text=No+Image' }}" alt="{{ $movie->display_title }}">
                         </div>
                         <div class="p-4">
                             <h3 class="font-medium text-gray-900">{{ $movie->display_title }}</h3>
